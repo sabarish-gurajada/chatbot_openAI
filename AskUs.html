@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css">
+    <link rel="stylesheet" href="style.css">
+    <title>Chatbot - Brave Coder</title>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="title">Talk to us</div>
+
+        <div id="chatbox" class="box">
+
+   		 <!-- Chat messages will be displayed here -->
+
+	</div>
+        <div class="typing-area">
+            <div class="input-field">
+                <input type="text" id="userInput" placeholder="Type your message" required>
+                <button onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+<script>
+
+function sendMessage() {
+
+    // Get user input
+
+    var userInput = document.getElementById('userInput').value;
+
+ 
+
+    // Display user message in the chatbox
+
+    appendMessage('Me', userInput);
+
+ 
+
+    // Send message to OpenAI API
+
+    fetch('https://api.openai.com/v1/chat/completions', {
+
+        method: 'POST',
+
+        headers: {
+
+            'Content-Type': 'application/json',
+
+            'Authorization': 'Bearer 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' // Replace with your actual API key
+
+        },
+
+        body: JSON.stringify({
+
+            "model": "gpt-3.5-turbo",
+
+            "messages": [
+
+                {
+
+                    "role": "system",
+
+                    "content": "you are a bank advisor for customer onboarding"
+
+                },
+
+                {
+
+                    "role": "user",
+
+                    "content": userInput
+
+                }
+
+            ]
+
+        })
+
+    })
+
+    .then(response => response.json())
+
+    .then(data => {
+
+        // Display AI response in the chatbox
+
+        appendMessage('Serena', data.choices[0].message.content);
+
+    })
+
+    .catch(error => console.error('Error:', error));
+
+}
+
+ 
+
+function appendMessage(role, content) {
+
+    var chatbox = document.getElementById('chatbox');
+
+    var messageDiv = document.createElement('div');
+
+    messageDiv.className = role;
+
+    messageDiv.textContent = role.toUpperCase() + ': ' + content;
+
+    chatbox.appendChild(messageDiv);
+
+ 
+
+    // Clear user input after sending
+
+    document.getElementById('userInput').value = '';
+
+}
+
+</script>
+
+</body>
+</html>

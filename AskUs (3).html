@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TCSGENAI-Ideathon Chatbot</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px; /* Increased padding */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+        }
+
+        h1 {
+            color: #333; /* Header text color */
+        }
+
+        #chatbox {
+            height: 300px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fff;
+            width: 80%;
+            box-sizing: border-box;
+            white-space: pre-line; /* Display new lines as entered in the content */
+        }
+
+        #userInput {
+            width: 70%;
+            padding: 15px; /* Increased padding */
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-right: 10px;
+            font-size: 16px; /* Increased font size */
+            color: #333; /* Set font color */
+        }
+
+        #sendButton {
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            padding: 15px; /* Increased padding */
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px; /* Increased font size */
+        }
+
+
+        .user, .ai {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .user .icon, .ai .icon {
+            font-size: 24px;
+            margin-right: 10px;
+        }
+
+        .user .icon {
+            color: #2196F3; /* Set user icon color */
+        }
+
+        .ai .icon {
+            color: #4CAF50; /* Set AI icon color */
+        }
+
+        .content {
+            padding: 10px;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            color: #333; /* Set message text color */
+        }
+	.chatbot-container {
+    width: 500px;
+    margin: 0 auto;
+    background-color: #f8e0e0;
+    border: 1px solid #0a0101;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(39, 8, 214, 0.1);
+  }
+
+  #header {
+    background-color: lightblue;
+    color: #ffffff;
+    padding: 20px;
+    font-size: 1em;
+    font-weight: bold;
+    font-family: Lucida Console;
+    text-align:center;
+  }
+  .chatbot-message {
+    display: flex;
+    align-items: flex-start;
+    position: relative;
+    font-size: 16px;
+    line-height: 20px;
+    border-radius: 20px;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    max-width: 100%;
+    padding: 0 15px;
+  }
+.chatbot-text {
+    background-color: rgb(234, 237, 238);
+    color: #000000;
+    font-size: 1.1em;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+    </style>
+    <script>
+        document.addEventListener('contextmenu', function (e) {
+            e.preventDefault();
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.ctrlKey && (e.which == 85 || e.which == 83)) {
+                e.preventDefault();
+            }
+        });
+    </script>
+</head>
+<body>
+<div class="chatbot-container">
+        <div id="header">
+            <h1>TCS Gen AI-Ideathon Chatbot</h1>
+        </div>
+<div id="chatbox">
+ <div id="conversation">
+              <div class="chatbot-message">
+                <p class="chatbot-text">Hi! I,m Serena👋 it's great to see you!</p>
+              </div>
+            </div>
+    <!-- Chat messages will be displayed here -->
+</div>
+<div class="user">
+    <i class="fas fa-user icon"></i>
+    <input type="text" id="userInput" placeholder="Type your message...">
+    <button id="sendButton" onclick="sendMessage()">Send</button>
+</div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+<script>
+function sendMessage() {
+    // Get user input
+    var userInput = document.getElementById('userInput').value;
+
+    // Display user message in the chatbox
+    appendMessage('user', userInput);
+
+    // Send message to OpenAI API
+    fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer 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' // Replace with your actual API key
+        },
+        body: JSON.stringify({
+            "model": "gpt-3.5-turbo",
+            "messages": [
+                {
+                    "role": "system",
+                    "content": "you are a bank advisor for customer onboarding"
+                },
+                {
+                    "role": "user",
+                    "content": userInput
+                }
+            ]
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Display AI response in the chatbox
+        appendMessage('ai', data.choices[0].message.content);
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function appendMessage(role, content) {
+    var chatbox = document.getElementById('chatbox');
+    var messageDiv = document.createElement('div');
+    messageDiv.className = role;
+    messageDiv.innerHTML = `
+        <i class="fas fa-${role === 'user' ? 'user' : 'robot'} icon"></i>
+        <div class="content">${role === 'user' ? 'You' : 'Serena'}: ${content}</div>
+    `;
+    chatbox.appendChild(messageDiv);
+
+    // Clear user input after sending
+    document.getElementById('userInput').value = '';
+
+    // Scroll to the bottom to show the latest message
+    chatbox.scrollTop = chatbox.scrollHeight;
+}
+
+</script>
+
+</body>
+</html>
